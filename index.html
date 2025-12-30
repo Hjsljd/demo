@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>New Year Surprise 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --primary: #ff4d6d;
+            --secondary: #7209b7;
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #app { width: 100%; max-width: 400px; padding: 20px; position: relative; }
+
+        .slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .slide.active { display: flex; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h2 { font-family: 'Fredoka One', cursive; margin-bottom: 10px; font-weight: 400; }
+        p { opacity: 0.8; margin-top: 0; }
+
+        /* --- STEP 1: PROGRESS HEART --- */
+        .hold-box {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .progress-svg {
+            position: absolute;
+            transform: rotate(-90deg);
+            width: 100%; height: 100%;
+        }
+
+        .progress-svg circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+
+        .circle-bg { stroke: var(--glass); }
+        .circle-bar {
+            stroke: var(--primary);
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        .heart { font-size: 60px; transition: transform 0.2s; }
+        .pressing .heart { transform: scale(0.8); }
+
+        /* --- STEP 2: DISTRACTIONS --- */
+        .distraction-zone {
+            position: relative;
+            width: 300px;
+            height: 350px;
+            margin-top: 20px;
+        }
+
+        .card {
+            position: absolute;
+            width: 130px;
+            height: 170px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s;
+            z-index: 2;
+        }
+
+        .card span { font-size: 24px; margin-bottom: 8px; }
+
+        .gift-container {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .gift-btn {
+            font-size: 60px;
+            background: var(--primary);
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.4);
+            cursor: pointer;
+        }
+
+        /* --- STEP 3: GOLDEN TICKET --- */
+        .ticket {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid gold;
+            border-radius: 20px;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+        }
+
+        .ticket::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), transparent);
+            transform: rotate(45deg); animation: shine 3s infinite;
+        }
+
+        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+
+        /* --- STEP 5: FINAL CARD --- */
+        .ny-card {
+            width: 320px;
+            background: #fff;
+            color: #222;
+            border-radius: 24px;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card-header { padding: 40px 20px; background: #fafafa; }
+        .card-body { 
+            max-height: 0; opacity: 0; 
+            padding: 0 30px; 
+            text-align: left;
+            transition: all 0.6s ease;
+        }
+
+        .ny-card.open { transform: translateY(-10px); }
+        .ny-card.open .card-body { max-height: 400px; opacity: 1; padding-bottom: 40px; }
+
+        .btn {
+            background: white; border: none; padding: 12px 25px;
+            border-radius: 50px; font-family: inherit; font-weight: bold;
+            cursor: pointer; margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div class="slide active" id="s1">
+            <h2>A little surprise for you</h2>
+            <p>Before this year begins</p>
+            <div class="hold-box" id="hold-btn">
+                <svg class="progress-svg" viewBox="0 0 150 150">
+                    <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
+                    <circle class="circle-bar" id="bar" cx="75" cy="75" r="70"></circle>
+                </svg>
+                <div class="heart">❤️</div>
+            </div>
+            <p><small>Tap and hold to unlock</small></p>
+        </div>
+
+        <div class="slide" id="s2">
+            <h2>Something is waiting...</h2>
+            <p>Move the little distractions aside</p>
+            <div class="distraction-zone">
+                <div class="gift-container">
+                    <div class="gift-btn" id="gift-click">🎁</div>
+                </div>
+                <div class="card" style="top:10px; left:10px;"><span>📍</span>Distance</div>
+                <div class="card" style="top:30px; right:10px;"><span>🧠</span>Stress</div>
+                <div class="card" style="bottom:50px; left:20px;"><span>🌧️</span>Bad Days</div>
+                <div class="card" style="top:120px; left:90px;"><span>📘</span>college</div>
+            </div>
+        </div>
+
+        <div class="slide" id="s3">
+            <div class="ticket">
+                <h1 style="color:gold; margin:0; letter-spacing:4px;">GOLDEN TICKET</h1>
+                <p style="font-size:12px; letter-spacing:2px;">VALID FOR EVERY DAY AHEAD</p>
+                <h2 style="font-style:italic; margin:30px 0;">"Unlimited Love & Smiles"</h2>
+                <p style="font-size:12px;">No expiration date</p>
+                <button class="btn" onclick="next(3)">CLAIM TICKET ></button>
+            </div>
+        </div>
+
+        <div class="slide" id="s4">
+            <h2>Moments from this year</h2>
+            <div onclick="next(4)" style="cursor:pointer">
+                <img src="https://in.pinterest.com/pin/681310249928728416/" style="border:9px solid white; border-bottom:60px solid white; border-radius:4px; box-shadow:0 20px 40px rgba(0,0,0,0.5);width: 340px;height:650px">
+                <p style="color:#333; margin-top:-50px; position:relative; font-weight:bold;">Tap to continue</p>
+            </div>
+        </div>
+
+        <div class="slide" id="s5">
+            <h3 style="font-weight:300;">For my Bubu... :)</h3>
+            <div class="ny-card" id="final-card">
+                <div class="card-header">
+                    <h2 style="margin:0; color:#333;">HAPPY NEW YEAR</h2>
+                    <h1 style="font-size:60px; margin:0; color:var(--primary);">2026</h1>
+                </div>
+                <div class="card-body">
+                    <p>I hope this year brings you calm mornings, peaceful nights, and moments that make you smile for no reason.</p>
+                    <p><b>You are special, and you deserve a year filled with happiness.</b></p>
+                    <p>
+                        <b>
+                            Love you bubu..💙<!--Tab to edit-->
+                        </b>
+                    </p>
+                </div>
+            </div>
+            <p><small>Tap the card to read</small></p>
+        </div>
+    </div>
+
+    <script>
+        const next = (id) => {
+            document.getElementById('s' + id).classList.remove('active');
+            document.getElementById('s' + (id + 1)).classList.add('active');
+            if(id + 1 === 3) {
+                // Trigger confetti on ticket screen
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff4d6d', '#ffb703', '#ffffff'] });
+            }
+        };
+
+        // 1. Hold to Progress Logic
+        const holdBtn = document.getElementById('hold-btn');
+        const bar = document.getElementById('bar');
+        let holdTimer;
+        let progress = 0;
+
+        const startHold = (e) => {
+            e.preventDefault();
+            holdBtn.classList.add('pressing');
+            holdTimer = setInterval(() => {
+                progress += 5;
+                bar.style.strokeDashoffset = 440 - (progress / 100) * 440;
+                if (progress >= 100) {
+                    clearInterval(holdTimer);
+                    next(1);
+                }
+            }, 50);
+        };
+
+        const stopHold = () => {
+            holdBtn.classList.remove('pressing');
+            clearInterval(holdTimer);
+            progress = 0;
+            bar.style.strokeDashoffset = 440;
+        };
+
+        holdBtn.addEventListener('mousedown', startHold);
+        holdBtn.addEventListener('touchstart', startHold);
+        window.addEventListener('mouseup', stopHold);
+        window.addEventListener('touchend', stopHold);
+
+        // 2. Distraction Flick Logic
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                card.style.transform = `translate(${side * 600}px, -200px) rotate(${side * 90}deg)`;
+                card.style.opacity = "0";
+                card.style.pointerEvents = "none";
+            });
+        });
+
+        document.getElementById('gift-click').addEventListener('click', () => next(2));
+
+        // 3. Final Card Toggle
+        document.getElementById('final-card').addEventListener('click', function() {
+            this.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>
